@@ -6,7 +6,8 @@ import { Worklet } from 'react-native-bare-kit'
 const CURRENCIES = ['btc', 'eth'];
 const ORANGE = '#FF8C00';
 
-let ipc
+
+
 export default function WalletScreen() {
   const [currency, setCurrency] = useState('btc');
   const [senderAddress, setSenderAddress] = useState('');
@@ -15,27 +16,31 @@ export default function WalletScreen() {
   const [fee, setFee] = useState('');
   const [loading, setLoading] = useState(true);
   const [displayData, setDisplayData] = useState(null);
-
+  const [ipc, setIpc] = useState(999);
   const worklet = new Worklet()
-
   const [response, setReponse] = useState<string | null>(null)
+
+  async function setupBundle() {
+
+    const socket  = worklet.IPC
+    setIpc(socket)
+    socket.setEncoding('utf8')
+    socket.on('data', (data) => {
+      const str = JSON.parse(data)
+      console.log("from bare", data)
+      setDisplayData(JSON.stringify(str,null,1))
+    })
+  }
 
   useEffect(() => {
     console.log("START")
-    const worklet = new Worklet()
 
     worklet.start(
       '/app.bundle',
       require('../app.bundle.cjs')
     ).then(() => {
       setLoading(false)
-      ipc = worklet.IPC
-      ipc.setEncoding('utf8')
-      ipc.on('data', (data) => {
-        const str = JSON.parse(data)
-        console.log("from bare", data)
-        setDisplayData(JSON.stringify(str,null,1))
-      })
+      setupBundle()
     })
     .catch((e) => console.log(e))
   }, [])
@@ -43,12 +48,14 @@ export default function WalletScreen() {
 
   const handleButtonPress = (action) => {
     
+    console.log(ipc)
     if(action === 'newWallet') {
       return ipc.write(JSON.stringify({
         method : `manager.createWallet`,
         params : []
       }))
     }
+    console.log(ipc)
     ipc.write(JSON.stringify({
       method : `wallet.default.pay.${currency}.${action}`,
       params : []
@@ -91,6 +98,9 @@ export default function WalletScreen() {
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={() => handleButtonPress('getFundedAddresses')}>
           <Text style={styles.buttonText}>Funded Addresses</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => handleButtonPress('getConnectionStatus')}>
+          <Text style={styles.buttonText}>Connection Status</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={() => handleButtonPress('getBalance')}>
           <Text style={styles.buttonText}>Balance</Text>
