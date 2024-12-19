@@ -47,15 +47,12 @@ export default function WalletScreen() {
 
 
   const handleButtonPress = (action) => {
-    
-    console.log(ipc)
     if(action === 'newWallet') {
       return ipc.write(JSON.stringify({
         method : `manager.createWallet`,
         params : []
       }))
     }
-    console.log(ipc)
     ipc.write(JSON.stringify({
       method : `wallet.default.pay.${currency}.${action}`,
       params : []
@@ -101,6 +98,9 @@ export default function WalletScreen() {
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={() => handleButtonPress('getConnectionStatus')}>
           <Text style={styles.buttonText}>Connection Status</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => handleButtonPress('reconnect')}>
+          <Text style={styles.buttonText}>Reconnect</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={() => handleButtonPress('getBalance')}>
           <Text style={styles.buttonText}>Balance</Text>
