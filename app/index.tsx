@@ -1,11 +1,13 @@
 import React, { useState, useEffect} from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-
+import { Platform, View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Worklet } from 'react-native-bare-kit'
 
 const CURRENCIES = ['btc', 'eth'];
 const ORANGE = '#FF8C00';
 
+
+const iosBundle = require('../ios.bundle.cjs')
+const androidBundle  = require('../android.bundle.cjs')
 
 
 export default function WalletScreen() {
@@ -16,7 +18,7 @@ export default function WalletScreen() {
   const [fee, setFee] = useState('');
   const [loading, setLoading] = useState(true);
   const [displayData, setDisplayData] = useState(null);
-  const [ipc, setIpc] = useState(999);
+  const [ipc, setIpc] = useState();
   const worklet = new Worklet()
   const [response, setReponse] = useState<string | null>(null)
 
@@ -30,19 +32,23 @@ export default function WalletScreen() {
       console.log("from bare", data)
       setDisplayData(JSON.stringify(str,null,1))
     })
+
   }
 
   useEffect(() => {
     console.log("START")
-
+    const bundle = Platform.OS === 'ios' ? iosBundle : androidBundle
     worklet.start(
       '/app.bundle',
-      require('../app.bundle.cjs')
+      bundle
     ).then(() => {
       setLoading(false)
       setupBundle()
     })
     .catch((e) => console.log(e))
+    return () => {
+      worklet.terminate()
+    }
   }, [])
 
 
@@ -101,6 +107,9 @@ export default function WalletScreen() {
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={() => handleButtonPress('reconnect')}>
           <Text style={styles.buttonText}>Reconnect</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => handleButtonPress('getFeeEstimate')}>
+          <Text style={styles.buttonText}>Fee Estimate</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={() => handleButtonPress('getBalance')}>
           <Text style={styles.buttonText}>Balance</Text>
