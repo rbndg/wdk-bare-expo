@@ -61,16 +61,11 @@ export default function WalletScreen() {
 
   const handleButtonPress = (action) => {
     if(action === 'newWallet') {
-      return ipc.write(rpcMsg({
-        method : `manager.createWallet`,
-        params : []
-      }))
+      return ipc.write(rpcMsg(`manager.createWallet`, []))
     }
-    ipc.write(rpcMsg({
-      method : `wallet.default.pay.${currency}.${action}`,
-      params : []
-    }))
-  };
+    ipc.write(rpcMsg(`wallet.default.pay.${currency}.${action}`,[]))
+  }
+
 
   if(loading) return <Text> Loading </Text>
 
