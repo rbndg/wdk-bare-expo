@@ -9,6 +9,13 @@ const ORANGE = '#FF8C00';
 const iosBundle = require('../ios.bundle.cjs')
 const androidBundle  = require('../android.bundle.cjs')
 
+function rpcMsg(method, params) {
+  return JSON.stringify({
+    method, params
+  })
+}
+
+
 
 export default function WalletScreen() {
   const [currency, setCurrency] = useState('btc');
@@ -32,7 +39,7 @@ export default function WalletScreen() {
       console.log("from bare", data)
       setDisplayData(JSON.stringify(str,null,1))
     })
-
+    socket.write(rpcMsg('rpc.start', [{}]))
   }
 
   useEffect(() => {
@@ -54,12 +61,12 @@ export default function WalletScreen() {
 
   const handleButtonPress = (action) => {
     if(action === 'newWallet') {
-      return ipc.write(JSON.stringify({
+      return ipc.write(rpcMsg({
         method : `manager.createWallet`,
         params : []
       }))
     }
-    ipc.write(JSON.stringify({
+    ipc.write(rpcMsg({
       method : `wallet.default.pay.${currency}.${action}`,
       params : []
     }))
