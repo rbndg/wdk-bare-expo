@@ -1,10 +1,12 @@
 import React, { useState, useEffect} from 'react';
 import { Platform, View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Worklet } from 'react-native-bare-kit'
+import RNFS from 'react-native-fs';
 
 const CURRENCIES = ['btc', 'eth'];
 const ORANGE = '#FF8C00';
 
+const storePath =  RNFS.DocumentDirectoryPath;
 
 const iosBundle = require('../ios.bundle.cjs')
 const androidBundle  = require('../android.bundle.cjs')
@@ -39,7 +41,9 @@ export default function WalletScreen() {
       console.log("from bare", data)
       setDisplayData(JSON.stringify(str,null,1))
     })
-    socket.write(rpcMsg('rpc.start', [{}]))
+    socket.write(rpcMsg('rpc.start', [{
+      store_path : storePath
+    }]))
   }
 
   useEffect(() => {
