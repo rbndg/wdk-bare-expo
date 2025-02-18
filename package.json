@@ -51,7 +51,7 @@
     "expo-system-ui": "^4.0.5",
     "lib-wallet": "github:tetherto/lib-wallet",
     "lib-wallet-pay-btc": "github:tetherto/lib-wallet-pay-btc",
-    "lib-wallet-pay-eth": "github:rbndg/lib-wallet-pay-eth",
+    "lib-wallet-pay-eth": "github:rbndg/lib-wallet-pay-eth-main",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-native": "^0.76.3",
