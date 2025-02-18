@@ -21,7 +21,7 @@
   "dependencies": {
     "@lingui/react": "^4.13.0",
     "bare-buffer": "^3.0.1",
-    "bare-crypto": "github:rbndg/bare-crypto",
+    "bare-crypto": "^1.4.0",
     "bare-dns": "^2.0.0",
     "bare-fetch": "^2.1.0",
     "bare-fs": "^4.0.0",
@@ -51,14 +51,14 @@
     "expo-system-ui": "^4.0.5",
     "lib-wallet": "github:tetherto/lib-wallet",
     "lib-wallet-pay-btc": "github:tetherto/lib-wallet-pay-btc",
-    "lib-wallet-pay-eth": "github:tetherto/lib-wallet-pay-eth",
+    "lib-wallet-pay-eth": "github:rbndg/lib-wallet-pay-eth",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-native": "^0.76.3",
-    "react-native-bare-kit": "^0.4.4",
+    "react-native-bare-kit": "^0.4.8",
     "react-native-fs": "^2.20.0",
     "react-native-safe-area-context": "^4.14.0",
-    "sodium-native": "^4.3.1",
+    "sodium-native": "^4.3.2",
     "wallet-seed-bip39": "github:tetherto/lib-wallet-seed-bip39"
   },
   "devDependencies": {
