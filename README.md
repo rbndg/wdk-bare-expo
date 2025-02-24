@@ -15,7 +15,9 @@ This demo app demonstrates key WDK capabilities:
 - Connection status monitoring
 - Send/receive functionality
 
-![WDK Demo App Screenshot](assets/images/demo.png)
+<div align="center">
+  <img src="assets/images/demo.png" alt="WDK Demo App Screenshot" width="300"/>
+</div>
 
 ## Getting Started
 
