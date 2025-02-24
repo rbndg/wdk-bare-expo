@@ -37,28 +37,14 @@ export default function WalletScreen() {
     socket.setEncoding('utf8')
     
     socket.on('data', (data: string) => {
-      const response: WDKResponse = JSON.parse(data);
-      console.log("From WDK:", response);
-
-      // Handle status notifications
-      if (response.method === 'rpc.status') {
-        const status = response.params?.[0].status;
-        if (status === 'error') {
-          console.error('RPC Error:', response.params?.[0].message);
-        }
-        return;
-      }
-
-      // Handle errors
-      if (response.error) {
-        console.error(`Error ${response.error.code}: ${response.error.msg}`);
-        setDisplayData(JSON.stringify({ error: response.error }, null, 1));
-        return;
-      }
-
-      // Handle successful results
-      if (response.result) {
-        setDisplayData(JSON.stringify(response.result, null, 1));
+      console.log("from bare", data);
+      try {
+        const str = JSON.parse(data);
+        console.log("from bare", data)
+        setDisplayData(JSON.stringify(str, null, 1)); 
+      } catch (error) {
+        console.error("Error parsing data:", error);
+        setDisplayData("Error parsing data");
       }
     })
     socket.write(rpcMsg('rpc.start', [{
