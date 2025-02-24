@@ -1,23 +1,24 @@
 import React, { useState, useEffect} from 'react';
-import { Platform, View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { Platform, View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Worklet } from 'react-native-bare-kit'
 import RNFS from 'react-native-fs';
+import { styles } from './styles/wallet';
+import type { WDKResponse } from './types/wallet';
 
-const CURRENCIES = ['btc', 'eth'];
 const ORANGE = '#FF8C00';
 
-const storePath =  RNFS.DocumentDirectoryPath;
+const CURRENCIES = ['btc', 'eth']; 
+
+const storePath = RNFS.DocumentDirectoryPath;
 
 const iosBundle = require('../ios.bundle.cjs')
-const androidBundle  = require('../android.bundle.cjs')
+const androidBundle = require('../android.bundle.cjs')
 
-function rpcMsg(method : string, params : any[]) {
+function rpcMsg(method: string, params: any[]) {
   return JSON.stringify({
     method, params
   })
 }
-
-
 
 export default function WalletScreen() {
   const [currency, setCurrency] = useState('btc');
@@ -29,17 +30,36 @@ export default function WalletScreen() {
   const [displayData, setDisplayData] = useState<string | null>(null);
   const [ipc, setIpc] = useState<any>(null);
   const worklet = new Worklet()
-  const [response, setReponse] = useState<string | null>(null)
 
   async function setupBundle() {
-
-    const socket  = worklet.IPC
+    const socket = worklet.IPC
     setIpc(socket)
     socket.setEncoding('utf8')
-    socket.on('data', (data : string) => {
-      const str = JSON.parse(data)
-      console.log("from bare", data)
-      setDisplayData(JSON.stringify(str,null,1))
+    
+    socket.on('data', (data: string) => {
+      const response: WDKResponse = JSON.parse(data);
+      console.log("From WDK:", response);
+
+      // Handle status notifications
+      if (response.method === 'rpc.status') {
+        const status = response.params?.[0].status;
+        if (status === 'error') {
+          console.error('RPC Error:', response.params?.[0].message);
+        }
+        return;
+      }
+
+      // Handle errors
+      if (response.error) {
+        console.error(`Error ${response.error.code}: ${response.error.msg}`);
+        setDisplayData(JSON.stringify({ error: response.error }, null, 1));
+        return;
+      }
+
+      // Handle successful results
+      if (response.result) {
+        setDisplayData(JSON.stringify(response.result, null, 1));
+      }
     })
     socket.write(rpcMsg('rpc.start', [{
       store_path : storePath
@@ -168,113 +188,3 @@ export default function WalletScreen() {
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#000000',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: ORANGE,
-  },
-  currencyButtons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  currencyButton: {
-    backgroundColor: '#1A1A1A',
-    padding: 12,
-    borderRadius: 8,
-    marginHorizontal: 8,
-    borderWidth: 1,
-    borderColor: ORANGE,
-  },
-  currencyButtonActive: {
-    backgroundColor: ORANGE,
-  },
-  currencyButtonText: {
-    color: ORANGE,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  currencyButtonTextActive: {
-    color: '#000000',
-  },
-  buttonGroup: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginBottom: 24,
-  },
-  button: {
-    backgroundColor: '#1A1A1A',
-    padding: 12,
-    borderRadius: 8,
-    width: '48%',
-    marginBottom: 16,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: ORANGE,
-  },
-  buttonText: {
-    color: ORANGE,
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  dataDisplay: {
-    backgroundColor: '#1A1A1A',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 24,
-    borderWidth: 1,
-    borderColor: ORANGE,
-  },
-  dataDisplayTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: ORANGE,
-    marginBottom: 8,
-  },
-  dataDisplayContent: {
-    fontFamily: 'monospace',
-    color: '#FFFFFF',
-  },
-  sendSection: {
-    backgroundColor: '#1A1A1A',
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: ORANGE,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    color: ORANGE,
-  },
-  input: {
-    backgroundColor: '#000000',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
-    fontSize: 16,
-    color: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: ORANGE,
-  },
-  sendButton: {
-    backgroundColor: '#1A1A1A',
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 8,
-    borderWidth: 1,
-    borderColor: ORANGE,
-  },
-});
