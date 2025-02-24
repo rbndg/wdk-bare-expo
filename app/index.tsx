@@ -11,7 +11,7 @@ const storePath =  RNFS.DocumentDirectoryPath;
 const iosBundle = require('../ios.bundle.cjs')
 const androidBundle  = require('../android.bundle.cjs')
 
-function rpcMsg(method, params) {
+function rpcMsg(method : string, params : any[]) {
   return JSON.stringify({
     method, params
   })
@@ -26,8 +26,8 @@ export default function WalletScreen() {
   const [amount, setAmount] = useState('');
   const [fee, setFee] = useState('');
   const [loading, setLoading] = useState(true);
-  const [displayData, setDisplayData] = useState(null);
-  const [ipc, setIpc] = useState();
+  const [displayData, setDisplayData] = useState<string | null>(null);
+  const [ipc, setIpc] = useState<any>(null);
   const worklet = new Worklet()
   const [response, setReponse] = useState<string | null>(null)
 
@@ -36,7 +36,7 @@ export default function WalletScreen() {
     const socket  = worklet.IPC
     setIpc(socket)
     socket.setEncoding('utf8')
-    socket.on('data', (data) => {
+    socket.on('data', (data : string) => {
       const str = JSON.parse(data)
       console.log("from bare", data)
       setDisplayData(JSON.stringify(str,null,1))
@@ -63,11 +63,11 @@ export default function WalletScreen() {
   }, [])
 
 
-  const handleButtonPress = (action) => {
+  const handleButtonPress = (action : string) => {
     if(action === 'newWallet') {
-      return ipc.write(rpcMsg(`manager.createWallet`, []))
+      return ipc?.write(rpcMsg(`manager.createWallet`, []))
     }
-    ipc.write(rpcMsg(`wallet.default.pay.${currency}.${action}`,[]))
+    ipc?.write(rpcMsg(`wallet.default.pay.${currency}.${action}`,[]))
   }
 
 
